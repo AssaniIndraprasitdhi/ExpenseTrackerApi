@@ -86,7 +86,7 @@ ExpenseTrackerApi/
 1. **Clone the repo**
 
    ```bash
-   git clone https://github.com/YourUsername/ExpenseTrackerApi.git
+   git clone https://github.com/AssaniIndraprasitdhi/ExpenseTrackerApi.git
    cd ExpenseTrackerApi
    ```
 
