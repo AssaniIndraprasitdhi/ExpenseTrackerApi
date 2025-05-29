@@ -1,18 +1,18 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.Security.Cryptography;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using ExpenseTrackerApi.Data;
 using ExpenseTrackerApi.DTOs.Auth;
 using ExpenseTrackerApi.Helpers;
 using ExpenseTrackerApi.Interfaces;
 using ExpenseTrackerApi.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ExpenseTrackerApi.Services
 {
@@ -20,6 +20,7 @@ namespace ExpenseTrackerApi.Services
     {
         private readonly AppDbContext _db;
         private readonly JwtSettings _jwtSettings;
+
         public AuthService(AppDbContext db, IOptions<JwtSettings> jwtOptions)
         {
             _db = db;
@@ -38,7 +39,8 @@ namespace ExpenseTrackerApi.Services
             {
                 Username = dto.Username,
                 PasswordSalt = hmac.Key,
-                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.Password))
+                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.Password)),
+                RoleId = 2,
             };
 
             // Save user
@@ -64,18 +66,20 @@ namespace ExpenseTrackerApi.Services
             var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name,           user.Username)
-                }),
+                Subject = new ClaimsIdentity(
+                    new[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new Claim(ClaimTypes.Name, user.Username),
+                    }
+                ),
                 Expires = DateTime.UtcNow.AddDays(_jwtSettings.ExpiresInDay),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256Signature
-                )
+                ),
             };
-            
+
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }

@@ -1,4 +1,5 @@
 using ExpenseTrackerApi.DTOs.Auth;
+
 namespace ExpenseTrackerApi.Interfaces
 {
     public interface IAuthService

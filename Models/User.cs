@@ -6,11 +6,11 @@ namespace ExpenseTrackerApi.Models
     public class User
     {
         [Key]
-        public int    Id           { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [MaxLength(50)]
-        public string Username     { get; set; } = null!;
+        public string Username { get; set; } = null!;
 
         [Required]
         public byte[] PasswordHash { get; set; } = null!;
@@ -18,6 +18,11 @@ namespace ExpenseTrackerApi.Models
         [Required]
         public byte[] PasswordSalt { get; set; } = null!;
 
-        public DateTime CreatedAt  { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // Role relationship
+        [Required]
+        public int RoleId { get; set; }
+        public Role Role { get; set; } = null!;
     }
 }
